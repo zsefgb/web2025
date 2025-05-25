@@ -25,6 +25,6 @@ jobs:
         run: |
           cd ./project
           pnpm install
-          pnpm build && touch ./out/.nojekyll
-          gh-pages -d out --dotfiles
+          pnpm build
+          pnpm run deploy
           
