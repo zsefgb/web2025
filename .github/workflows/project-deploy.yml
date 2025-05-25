@@ -12,9 +12,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install and Build
+      - name: Setup pnpm
+        # You may pin to the exact commit or the version.
+        # uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          run_install: true
+          
+
+      - name: Build
         run: |
-          pnpm install
+          pwd
           pnpm build && touch ./out/.nojekyll
 
       - name: Deploy 🚀
