@@ -26,9 +26,5 @@ jobs:
           cd ./project
           pnpm install
           pnpm build && touch ./out/.nojekyll
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: project/out
+          gh-pages -d out --dotfiles
+          
