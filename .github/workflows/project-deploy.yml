@@ -24,7 +24,6 @@ jobs:
       - name: Build
         run: |
           cd ./project
-          pwd
           pnpm install
           pnpm build && touch ./out/.nojekyll
 
@@ -32,4 +31,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: out
+          folder: project/out
