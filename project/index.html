@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 날씨 & 뉴스</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 공통 스타일 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+
+        /* 헤더 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 40px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: #212529;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+
+        /* 네비게이션 */
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #495057;
+        }
+
+        .nav-item.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .nav-item:hover {
+            border-color: #007bff;
+        }
+
+        /* 페이지 컨테이너 */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 메인 대시보드 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        /* 날씨 카드 */
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .weather-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .weather-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .temperature {
+            font-size: 3rem;
+            font-weight: 300;
+            color: #212529;
+        }
+
+        .weather-icon {
+            font-size: 4rem;
+        }
+
+        .weather-desc {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+
+        /* 뉴스 섹션 */
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .news-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .category-select {
+            padding: 8px 16px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .news-grid {
+            display: grid;
+            gap: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .news-item {
+            display: flex;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 20px;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .news-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .news-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .news-content {
+            flex: 1;
+        }
+
+        .news-headline {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #212529;
+            line-height: 1.4;
+        }
+
+        .news-summary {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+
+        /* 상세 페이지 스타일 */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .detail-card h3 {
+            color: #6c757d;
+            font-weight: 400;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .detail-card .value {
+            font-size: 2rem;
+            font-weight: 300;
+            color: #212529;
+        }
+
+        .forecast-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .forecast-day {
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .forecast-temp {
+            color: #6c757d;
+        }
+
+        /* 뉴스 상세 페이지 */
+        .news-detail-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .news-detail-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .news-detail-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-detail-content {
+            padding: 20px;
+        }
+
+        .news-detail-headline {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #212529;
+        }
+
+        .news-detail-summary {
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .news-detail-meta {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.9rem;
+            color: #adb5bd;
+        }
+
+        /* 공통 메시지 */
+        .loading, .error {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .weather-main {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .weather-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .news-item {
+                flex-direction: column;
+            }
+            
+            .news-image {
+                width: 100%;
+                height: 150px;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-item {
+                flex: 1;
+                text-align: center;
+                min-width: calc(50% - 5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">실시간 날씨 & 뉴스</h1>
+            <p class="subtitle">현재 날씨 정보와 최신 뉴스를 한눈에 확인하세요</p>
+        </header>
+
+        <!-- 네비게이션 -->
+        <nav class="nav">
+            <div class="nav-item active" onclick="showPage('main')">메인</div>
+            <div class="nav-item" onclick="showPage('weather-detail')">날씨 상세</div>
+            <div class="nav-item" onclick="showPage('news-detail')">뉴스 더보기</div>
+        </nav>
+
+        <!-- 메인 페이지 -->
+        <div id="main" class="page active">
+            <div class="dashboard">
+                <!-- 날씨 카드 -->
+                <div class="card">
+                    <div class="weather-header">
+                        <h2 class="weather-title">현재 날씨</h2>
+                        <button class="btn" onclick="getWeather()">새로고침</button>
+                    </div>
+                    <div id="weather-content">
+                        <div class="loading">날씨 정보를 불러오는 중...</div>
+                    </div>
+                </div>
+
+                <!-- 뉴스 섹션 -->
+                <div class="card">
+                    <div class="news-header">
+                        <h2 class="news-title">최신 뉴스</h2>
+                        <select class="category-select" id="newsCategory" onchange="getNews()">
+                            <option value="general">전체</option>
+                            <option value="technology">기술</option>
+                            <option value="business">경제</option>
+                            <option value="sports">스포츠</option>
+                            <option value="entertainment">연예</option>
+                            <option value="health">건강</option>
+                        </select>
+                    </div>
+                    <div id="news-content">
+                        <div class="loading">뉴스를 불러오는 중...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 날씨 상세 페이지 -->
+        <div id="weather-detail" class="page">
+            <div class="card">
+                <h2 style="margin-bottom: 30px; color: #212529;">상세 날씨 정보</h2>
+                <div id="weather-detail-content">
+                    <div class="loading">상세 날씨 정보를 불러오는 중...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 뉴스 상세 페이지 -->
+        <div id="news-detail" class="page">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="color: #212529;">전체 뉴스</h2>
+                    <select class="category-select" id="newsDetailCategory" onchange="getDetailNews()">
+                        <option value="general">전체</option>
+                        <option value="technology">기술</option>
+                        <option value="business">경제</option>
+                        <option value="sports">스포츠</option>
+                        <option value="entertainment">연예</option>
+                        <option value="health">건강</option>
+                    </select>
+                </div>
+                <div id="news-detail-content">
+                    <div class="loading">뉴스를 불러오는 중...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API 키 설정
+        const WEATHER_API_KEY = 'YOUR_OPENWEATHER_API_KEY';
+        const NEWS_API_KEY = 'YOUR_NEWS_API_KEY';
+
+        // 페이지 전환
+        function showPage(pageId) {
+            // 모든 페이지 숨기기
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // 모든 네비게이션 비활성화
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+            });
+
+            // 선택된 페이지 표시
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+
+            // 페이지별 데이터 로드
+            if (pageId === 'weather-detail') {
+                getWeatherDetail();
+            } else if (pageId === 'news-detail') {
+                getDetailNews();
+            }
+        }
+
+        // 날씨 정보 가져오기 (메인)
+        async function getWeather() {
+            const weatherContent = document.getElementById('weather-content');
+            weatherContent.innerHTML = '<div class="loading">날씨 정보를 불러오는 중...</div>';
+
+            try {
+                // 샘플 데이터
+                const data = {
+                    name: "서울",
+                    main: {
+                        temp: 22,
+                        feels_like: 24,
+                        humidity: 65,
+                        pressure: 1013
+                    },
+                    weather: [{
+                        main: "Clear",
+                        description: "맑음",
+                        icon: "01d"
+                    }],
+                    wind: {
+                        speed: 3.2
+                    }
+                };
+
+                displayWeather(data);
+            } catch (error) {
+                weatherContent.innerHTML = '<div class="error">날씨 정보를 불러올 수 없습니다.</div>';
+            }
+        }
+
+        // 날씨 정보 표시 (메인)
+        function displayWeather(data) {
+            const weatherIcons = {
+                '01d': '☀️', '01n': '🌙', '02d': '⛅', '02n': '☁️',
+                '03d': '☁️', '03n': '☁️', '04d': '☁️', '04n': '☁️',
+                '09d': '🌧️', '09n': '🌧️', '10d': '🌦️', '10n': '🌧️',
+                '11d': '⛈️', '11n': '⛈️', '13d': '❄️', '13n': '❄️',
+                '50d': '🌫️', '50n': '🌫️'
+            };
+
+            const weatherContent = document.getElementById('weather-content');
+            weatherContent.innerHTML = `
+                <div class="weather-main">
+                    <div>
+                        <div class="temperature">${Math.round(data.main.temp)}°C</div>
+                    </div>
+                    <div class="weather-icon">${weatherIcons[data.weather[0].icon] || '🌤️'}</div>
+                </div>
+                <div class="weather-desc">${data.weather[0].description}</div>
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <span>체감온도</span>
+                        <span>${Math.round(data.main.feels_like)}°C</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>습도</span>
+                        <span>${data.main.humidity}%</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>기압</span>
+                        <span>${data.main.pressure} hPa</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>풍속</span>
+                        <span>${data.wind.speed} m/s</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 상세 날씨 정보 가져오기
+        async function getWeatherDetail() {
+            const weatherDetailContent = document.getElementById('weather-detail-content');
+            weatherDetailContent.innerHTML = '<div class="loading">상세 날씨 정보를 불러오는 중...</div>';
+
+            try {
+                // 샘플 상세 데이터
+                const detailData = {
+                    current: {
+                        temp: 22,
+                        feels_like: 24,
+                        humidity: 65,
+                        pressure: 1013,
+                        visibility: 10,
+                        uvi: 5,
+                        wind_speed: 3.2,
+                        wind_deg: 230
+                    },
+                    forecast: [
+                        { day: '오늘', icon: '☀️', high: 25, low: 18, desc: '맑음' },
+                        { day: '내일', icon: '⛅', high: 23, low: 16, desc: '구름많음' },
+                        { day: '모레', icon: '🌧️', high: 20, low: 14, desc: '비' },
+                        { day: '3일후', icon: '☁️', high: 22, low: 15, desc: '흐림' },
+                        { day: '4일후', icon: '☀️', high: 26, low: 19, desc: '맑음' }
+                    ]
+                };
+
+                displayWeatherDetail(detailData);
+            } catch (error) {
+                weatherDetailContent.innerHTML = '<div class="error">상세 날씨 정보를 불러올 수 없습니다.</div>';
+            }
+        }
+
+        // 상세 날씨 정보 표시
+        function displayWeatherDetail(data) {
+            const weatherDetailContent = document.getElementById('weather-detail-content');
+            
+            const detailHTML = `
+                <div class="detail-grid">
+                    <div class="detail-card">
+                        <h3>현재 온도</h3>
+                        <div class="value">${data.current.temp}°C</div>
+                    </div>
+                    <div class="detail-card">
+                        <h3>체감 온도</h3>
+                        <div class="value">${data.current.feels_like}°C</div>
+                    </div>
+                    <div class="detail-card">
+                        <h3>습도</h3>
+                        <div class="value">${data.current.humidity}%</div>
+                    </div>
+                    <div class="detail-card">
+                        <h3>기압</h3>
+                        <div class="value">${data.current.pressure}<small style="font-size: 0.8rem; color: #6c757d;"> hPa</small></div>
+                    </div>
+                    <div class="detail-card">
+                        <h3>가시거리</h3>
+                        <div class="value">${data.current.visibility}<small style="font-size: 0.8rem; color: #6c757d;"> km</small></div>
+                    </div>
+                    <div class="detail-card">
+                        <h3>자외선 지수</h3>
+                        <div class="value">${data.current.uvi}</div>
+                    </div>
+                    <div class="detail-card">
+                        <h3>풍속</h3>
+                        <div class="value">${data.current.wind_speed}<small style="font-size: 0.8rem; color: #6c757d;"> m/s</small></div>
+                    </div>
+                    <div class="detail-card">
+                        <h3>풍향</h3>
+                        <div class="value">${data.current.wind_deg}°</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px 0; color: #212529;">5일 예보</h3>
+                <div>
+                    ${data.forecast.map(item => `
+                        <div class="forecast-item">
+                            <div class="forecast-day">${item.day}</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 1.5rem;">${item.icon}</span>
+                                <span style="color: #6c757d;">${item.desc}</span>
+                            </div>
+                            <div class="forecast-temp">${item.high}° / ${item.low}°</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            weatherDetailContent.innerHTML = detailHTML;
+        }
+
+        // 뉴스 정보 가져오기 (메인)
+        async function getNews() {
+            const newsContent = document.getElementById('news-content');
+            newsContent.innerHTML = '<div class="loading">뉴스를 불러오는 중...</div>';
+
+            try {
+                const sampleNews = [
+                    {
+                        title: "인공지능 기술의 새로운 돌파구 발견",
+                        description: "연구진들이 더욱 효율적인 AI 알고리즘을 개발했다고 발표했습니다.",
+                        urlToImage: "https://via.placeholder.com/300x200/007bff/ffffff?text=AI+News",
+                        url: "#",
+                        source: { name: "Tech News" },
+                        publishedAt: "2025-06-07T10:00:00Z"
+                    },
+                    {
+                        title: "경제 전망 밝아져, 주가 상승세 지속",
+                        description: "전문가들은 올해 하반기 경제 성장률이 예상보다 높을 것이라고 전망했습니다.",
+                        urlToImage: "https://via.placeholder.com/300x200/28a745/ffffff?text=Economy",
+                        url: "#",
+                        source: { name: "Economic Times" },
+                        publishedAt: "2025-06-07T09:30:00Z"
+                    },
+                    {
+                        title: "환경 친화적 신기술 상용화 임박",
+                        description: "재생 에너지 효율을 크게 향상시킬 수 있는 새로운 기술이 상용화 단계에 접어들었습니다.",
+                        urlToImage: "https://via.placeholder.com/300x200/17a2b8/ffffff?text=Green+Tech",
+                        url: "#",
+                        source: { name: "Green News" },
+                        publishedAt: "2025-06-07T08:45:00Z"
+                    }
+                ];
+
+                displayNews(sampleNews.slice(0, 3));
+            } catch (error) {
+                newsContent.innerHTML = '<div class="error">뉴스를 불러올 수 없습니다.</div>';
+            }
+        }
+
+        // 뉴스 표시 (메인)
+        function displayNews(articles) {
+            const newsContent = document.getElementById('news-content');
+            
+            const newsHTML = articles.map(article => `
+                <div class="news-item" onclick="window.open('${article.url}', '_blank')">
+                    <img src="${article.urlToImage}" alt="뉴스 이미지" class="news-image">
+                    <div class="news-content">
+                        <h3 class="news-headline">${article.title}</h3>
+                        <p class="news-summary">${article.description}</p>
+                        <div class="news-meta">
+                            <span>${article.source.name}</span>
+                            <span>${new Date(article.publishedAt).toLocaleDateString('ko-KR')}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            newsContent.innerHTML = `<div class="news-grid">${newsHTML}</div>`;
+        }
+
+        // 상세 뉴스 가져오기
+        async function getDetailNews() {
+            const newsDetailContent = document.getElementById('news-detail-content');
+            const category = document.getElementById('newsDetailCategory').value;
+            
+            newsDetailContent.innerHTML = '<div class="loading">뉴스를 불러오는 중...</div>';
+
+            try {
+                const detailNews = [
+                    {
+                        title: "인공지능 기술의 새로운 돌파구 발견",
+                        description: "연구진들이 더욱 효율적인 AI 알고리즘을 개발했다고 발표했습니다. 이는 향후 다양한 분야에서 혁신적인 변화를 가져올 것으로 예상됩니다. 새로운 알고리즘은 기존 모델보다 30% 더 빠른 처리 속도를 보여주며, 에너지 효율성도 크게 개선되었습니다.",
+                        urlToImage: "https://via.placeholder.com/400x250/007bff/ffffff?text=AI+Technology",
+                        url: "#",
+                        source: { name: "Tech News" },
+                        publishedAt: "2025-06-07T10:00:00Z"
+                    },
+                    {
+                        title: "경제 전망 밝아져, 주가 상승세 지속",
+                        description: "전문가들은 올해 하반기 경제 성장률이 예상보다 높을 것이라고 전망했습니다. 이에 따라 주식시장도 활기를 띠고 있습니다. 특히 기술주와 바이오주가 강세를 보이고 있으며, 투자자들의 관심이 집중되고 있습니다.",
+                        urlToImage: "https://via.placeholder.com/400x250/28a745/ffffff?text=Economy+Growth",
+                        url: "#",
+                        source: { name: "Economic Times" },
+                        publishedAt: "2025-06-07T09:30:00Z"
+                    },
+                    {
+                        title: "환경 친화적 신기술 상용화 임박",
+                        description: "재생 에너지 효율을 크게 향상시킬 수 있는 새로운 기술이 상용화 단계에 접어들었습니다. 이 기술은 태양광 패널의 효율을 40% 향상시킬 수 있으며, 생산 비용도 기존 대비 25% 절감할 수 있다고 합니다.",
+                        urlToImage: "https://via.placeholder.com/400x250/17a2b8/ffffff?text=Green+Technology",
+                        url: "#",
+                        source: { name: "Green News" },
+                        publishedAt: "2025-06-07T08:45:00Z"
+                    },
+                    {
+                        title: "모바일 게임 시장 급성장, 새로운 트렌드 주목",
+                        description: "모바일 게임 산업이 전년 대비 35% 성장하며 새로운 기록을 세웠습니다. 특히 AR/VR 기술을 접목한 게임들이 큰 인기를 끌고 있으며, 메타버스 플랫폼과의 연계도 활발히 이루어지고 있습니다.",
+                        urlToImage: "https://via.placeholder.com/400x250/6f42c1/ffffff?text=Mobile+Gaming",
+                        url: "#",
+                        source: { name: "Game Daily" },
+                        publishedAt: "2025-06-07T08:00:00Z"
+                    },
+                    {
+                        title: "의료진 부족 문제 해결을 위한 새로운 정책 발표",
+                        description: "정부가 의료진 부족 문제를 해결하기 위해 새로운 정책을 발표했습니다. 의과대학 정원 확대와 함께 지방 근무 의사들에 대한 인센티브를 대폭 강화하기로 했습니다. 이를 통해 향후 5년간 의료 접근성을 크게 개선할 계획입니다.",
+                        urlToImage: "https://via.placeholder.com/400x250/dc3545/ffffff?text=Healthcare",
+                        url: "#",
+                        source: { name: "Health Today" },
+                        publishedAt: "2025-06-07T07:30:00Z"
+                    },
+                    {
+                        title: "스포츠 리그 새 시즌 개막, 관중들의 뜨거운 관심",
+                        description: "프로 스포츠 리그가 새 시즌을 맞아 개막했습니다. 팬들의 열정적인 응원 속에서 각 팀들이 치열한 경쟁을 벌이고 있으며, 올 시즌 우승 후보로 여러 팀이 거론되고 있습니다. 새로운 룰 변경으로 더욱 흥미진진한 경기가 예상됩니다.",
+                        urlToImage: "https://via.placeholder.com/400x250/fd7e14/ffffff?text=Sports+League",
+                        url: "#",
+                        source: { name: "Sports Weekly" },
+                        publishedAt: "2025-06-07T07:00:00Z"
+                    }
+                ];
+
+                displayDetailNews(detailNews);
+            } catch (error) {
+                newsDetailContent.innerHTML = '<div class="error">뉴스를 불러올 수 없습니다.</div>';
+            }
+        }
+
+        // 상세 뉴스 표시
+        function displayDetailNews(articles) {
+            const newsDetailContent = document.getElementById('news-detail-content');
+            
+            const newsHTML = articles.map(article => `
+                <div class="news-detail-item" onclick="window.open('${article.url}', '_blank')">
+                    <img src="${article.urlToImage}" alt="뉴스 이미지" class="news-detail-image">
+                    <div class="news-detail-content">
+                        <h3 class="news-detail-headline">${article.title}</h3>
+                        <p class="news-detail-summary">${article.description}</p>
+                        <div class="news-detail-meta">
+                            <span>${article.source.name}</span>
+                            <span>${new Date(article.publishedAt).toLocaleDateString('ko-KR')}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            newsDetailContent.innerHTML = `<div class="news-detail-grid">${newsHTML}</div>`;
+        }
+
+        // 페이지 로드시 초기 데이터 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            getWeather();
+            getNews();
+        });
+    </script>
+</body>
+</html>
