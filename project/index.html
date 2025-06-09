@@ -625,34 +625,14 @@
             newsContent.innerHTML = '<div class="loading">뉴스를 불러오는 중...</div>';
 
             try {
-                const sampleNews = [
-                    {
-                        title: "인공지능 기술의 새로운 돌파구 발견",
-                        description: "연구진들이 더욱 효율적인 AI 알고리즘을 개발했다고 발표했습니다.",
-                        urlToImage: "https://via.placeholder.com/300x200/007bff/ffffff?text=AI+News",
-                        url: "#",
-                        source: { name: "Tech News" },
-                        publishedAt: "2025-06-07T10:00:00Z"
-                    },
-                    {
-                        title: "경제 전망 밝아져, 주가 상승세 지속",
-                        description: "전문가들은 올해 하반기 경제 성장률이 예상보다 높을 것이라고 전망했습니다.",
-                        urlToImage: "https://via.placeholder.com/300x200/28a745/ffffff?text=Economy",
-                        url: "#",
-                        source: { name: "Economic Times" },
-                        publishedAt: "2025-06-07T09:30:00Z"
-                    },
-                    {
-                        title: "환경 친화적 신기술 상용화 임박",
-                        description: "재생 에너지 효율을 크게 향상시킬 수 있는 새로운 기술이 상용화 단계에 접어들었습니다.",
-                        urlToImage: "https://via.placeholder.com/300x200/17a2b8/ffffff?text=Green+Tech",
-                        url: "#",
-                        source: { name: "Green News" },
-                        publishedAt: "2025-06-07T08:45:00Z"
-                    }
-                ];
-
-                displayNews(sampleNews.slice(0, 3));
+                const response = await fetch('https://newsapi.org/v2/top-headlines?country=us&apiKey=e3200a43f4064e98b0df61aa424b5089');
+                const result = await response.json();
+        
+                if (result.status === 'ok') {
+                    displayNews(result.articles.slice(0, 3));
+                } else {
+                    newsContent.innerHTML = '<div class="error">뉴스를 불러올 수 없습니다.</div>';
+                }
             } catch (error) {
                 newsContent.innerHTML = '<div class="error">뉴스를 불러올 수 없습니다.</div>';
             }
@@ -686,58 +666,14 @@
             newsDetailContent.innerHTML = '<div class="loading">뉴스를 불러오는 중...</div>';
 
             try {
-                const detailNews = [
-                    {
-                        title: "인공지능 기술의 새로운 돌파구 발견",
-                        description: "연구진들이 더욱 효율적인 AI 알고리즘을 개발했다고 발표했습니다. 이는 향후 다양한 분야에서 혁신적인 변화를 가져올 것으로 예상됩니다. 새로운 알고리즘은 기존 모델보다 30% 더 빠른 처리 속도를 보여주며, 에너지 효율성도 크게 개선되었습니다.",
-                        urlToImage: "https://via.placeholder.com/400x250/007bff/ffffff?text=AI+Technology",
-                        url: "#",
-                        source: { name: "Tech News" },
-                        publishedAt: "2025-06-07T10:00:00Z"
-                    },
-                    {
-                        title: "경제 전망 밝아져, 주가 상승세 지속",
-                        description: "전문가들은 올해 하반기 경제 성장률이 예상보다 높을 것이라고 전망했습니다. 이에 따라 주식시장도 활기를 띠고 있습니다. 특히 기술주와 바이오주가 강세를 보이고 있으며, 투자자들의 관심이 집중되고 있습니다.",
-                        urlToImage: "https://via.placeholder.com/400x250/28a745/ffffff?text=Economy+Growth",
-                        url: "#",
-                        source: { name: "Economic Times" },
-                        publishedAt: "2025-06-07T09:30:00Z"
-                    },
-                    {
-                        title: "환경 친화적 신기술 상용화 임박",
-                        description: "재생 에너지 효율을 크게 향상시킬 수 있는 새로운 기술이 상용화 단계에 접어들었습니다. 이 기술은 태양광 패널의 효율을 40% 향상시킬 수 있으며, 생산 비용도 기존 대비 25% 절감할 수 있다고 합니다.",
-                        urlToImage: "https://via.placeholder.com/400x250/17a2b8/ffffff?text=Green+Technology",
-                        url: "#",
-                        source: { name: "Green News" },
-                        publishedAt: "2025-06-07T08:45:00Z"
-                    },
-                    {
-                        title: "모바일 게임 시장 급성장, 새로운 트렌드 주목",
-                        description: "모바일 게임 산업이 전년 대비 35% 성장하며 새로운 기록을 세웠습니다. 특히 AR/VR 기술을 접목한 게임들이 큰 인기를 끌고 있으며, 메타버스 플랫폼과의 연계도 활발히 이루어지고 있습니다.",
-                        urlToImage: "https://via.placeholder.com/400x250/6f42c1/ffffff?text=Mobile+Gaming",
-                        url: "#",
-                        source: { name: "Game Daily" },
-                        publishedAt: "2025-06-07T08:00:00Z"
-                    },
-                    {
-                        title: "의료진 부족 문제 해결을 위한 새로운 정책 발표",
-                        description: "정부가 의료진 부족 문제를 해결하기 위해 새로운 정책을 발표했습니다. 의과대학 정원 확대와 함께 지방 근무 의사들에 대한 인센티브를 대폭 강화하기로 했습니다. 이를 통해 향후 5년간 의료 접근성을 크게 개선할 계획입니다.",
-                        urlToImage: "https://via.placeholder.com/400x250/dc3545/ffffff?text=Healthcare",
-                        url: "#",
-                        source: { name: "Health Today" },
-                        publishedAt: "2025-06-07T07:30:00Z"
-                    },
-                    {
-                        title: "스포츠 리그 새 시즌 개막, 관중들의 뜨거운 관심",
-                        description: "프로 스포츠 리그가 새 시즌을 맞아 개막했습니다. 팬들의 열정적인 응원 속에서 각 팀들이 치열한 경쟁을 벌이고 있으며, 올 시즌 우승 후보로 여러 팀이 거론되고 있습니다. 새로운 룰 변경으로 더욱 흥미진진한 경기가 예상됩니다.",
-                        urlToImage: "https://via.placeholder.com/400x250/fd7e14/ffffff?text=Sports+League",
-                        url: "#",
-                        source: { name: "Sports Weekly" },
-                        publishedAt: "2025-06-07T07:00:00Z"
-                    }
-                ];
-
-                displayDetailNews(detailNews);
+                const response = await fetch('https://newsapi.org/v2/top-headlines?country=us&apiKey=e3200a43f4064e98b0df61aa424b5089');
+                const result = await response.json();
+        
+                if (result.status === 'ok') {
+                    displayNews(result.articles);
+                } else {
+                    newsContent.innerHTML = '<div class="error">뉴스를 불러올 수 없습니다.</div>';
+                }
             } catch (error) {
                 newsDetailContent.innerHTML = '<div class="error">뉴스를 불러올 수 없습니다.</div>';
             }
