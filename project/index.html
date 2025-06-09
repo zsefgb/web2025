@@ -78,34 +78,6 @@
             color: #6c757d;
         }
 
-        /* 네비게이션 */
-        .nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .nav-item {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid #dee2e6;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #495057;
-        }
-
-        .nav-item.active {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        .nav-item:hover {
-            border-color: #007bff;
-        }
-
         /* 페이지 컨테이너 */
         .page {
             display: none;
@@ -398,17 +370,6 @@
             .title {
                 font-size: 2rem;
             }
-
-            .nav {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .nav-item {
-                flex: 1;
-                text-align: center;
-                min-width: calc(50% - 5px);
-            }
         }
     </style>
 </head>
@@ -419,13 +380,6 @@
             <p class="subtitle">현재 날씨 정보와 최신 뉴스를 한눈에 확인하세요</p>
         </header>
 
-        <!-- 네비게이션 -->
-        <nav class="nav">
-            <div class="nav-item active" onclick="showPage('main')">메인</div>
-            <div class="nav-item" onclick="showPage('weather-detail')">날씨 상세</div>
-            <div class="nav-item" onclick="showPage('news-detail')">뉴스 더보기</div>
-        </nav>
-
         <!-- 메인 페이지 -->
         <div id="main" class="page active">
             <div class="dashboard">
@@ -433,7 +387,7 @@
                 <div class="card">
                     <div class="weather-header">
                         <h2 class="weather-title">현재 날씨</h2>
-                        <button class="btn" onclick="getWeather()">새로고침</button>
+                        <a href="#" onclick="showPage('weather-detail')" style="color: #007bff; text-decoration: none; font-size: 0.9rem;">자세히</a>
                     </div>
                     <div id="weather-content">
                         <div class="loading">날씨 정보를 불러오는 중...</div>
@@ -444,14 +398,7 @@
                 <div class="card">
                     <div class="news-header">
                         <h2 class="news-title">최신 뉴스</h2>
-                        <select class="category-select" id="newsCategory" onchange="getNews()">
-                            <option value="general">전체</option>
-                            <option value="technology">기술</option>
-                            <option value="business">경제</option>
-                            <option value="sports">스포츠</option>
-                            <option value="entertainment">연예</option>
-                            <option value="health">건강</option>
-                        </select>
+                        <a href="#" onclick="showPage('news-detail')" style="color: #007bff; text-decoration: none; font-size: 0.9rem;">자세히</a>
                     </div>
                     <div id="news-content">
                         <div class="loading">뉴스를 불러오는 중...</div>
@@ -463,7 +410,10 @@
         <!-- 날씨 상세 페이지 -->
         <div id="weather-detail" class="page">
             <div class="card">
-                <h2 style="margin-bottom: 30px; color: #212529;">상세 날씨 정보</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="color: #212529;">상세 날씨 정보</h2>
+                    <a href="#" onclick="showPage('main')" style="color: #007bff; text-decoration: none; font-size: 0.9rem;">← 돌아가기</a>
+                </div>
                 <div id="weather-detail-content">
                     <div class="loading">상세 날씨 정보를 불러오는 중...</div>
                 </div>
@@ -475,14 +425,7 @@
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                     <h2 style="color: #212529;">전체 뉴스</h2>
-                    <select class="category-select" id="newsDetailCategory" onchange="getDetailNews()">
-                        <option value="general">전체</option>
-                        <option value="technology">기술</option>
-                        <option value="business">경제</option>
-                        <option value="sports">스포츠</option>
-                        <option value="entertainment">연예</option>
-                        <option value="health">건강</option>
-                    </select>
+                    <a href="#" onclick="showPage('main')" style="color: #007bff; text-decoration: none; font-size: 0.9rem;">← 돌아가기</a>
                 </div>
                 <div id="news-detail-content">
                     <div class="loading">뉴스를 불러오는 중...</div>
@@ -503,14 +446,8 @@
                 page.classList.remove('active');
             });
 
-            // 모든 네비게이션 비활성화
-            document.querySelectorAll('.nav-item').forEach(nav => {
-                nav.classList.remove('active');
-            });
-
             // 선택된 페이지 표시
             document.getElementById(pageId).classList.add('active');
-            event.target.classList.add('active');
 
             // 페이지별 데이터 로드
             if (pageId === 'weather-detail') {
@@ -745,7 +682,6 @@
         // 상세 뉴스 가져오기
         async function getDetailNews() {
             const newsDetailContent = document.getElementById('news-detail-content');
-            const category = document.getElementById('newsDetailCategory').value;
             
             newsDetailContent.innerHTML = '<div class="loading">뉴스를 불러오는 중...</div>';
 
